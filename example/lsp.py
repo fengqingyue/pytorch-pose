@@ -3,7 +3,7 @@ from __future__ import print_function, absolute_import
 import os
 import argparse
 import time
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import torch
 import torch.nn.parallel
@@ -157,6 +157,7 @@ def train(train_loader, model, criterion, optimizer, debug=False, flip=True):
             loss += criterion(output[j], target_var)
         acc = accuracy(score_map, target, idx)
 
+        '''
         if debug: # visualize groundtruth and predictions
             gt_batch_img = batch_with_heatmap(inputs, target)
             pred_batch_img = batch_with_heatmap(inputs, score_map)
@@ -172,7 +173,8 @@ def train(train_loader, model, criterion, optimizer, debug=False, flip=True):
                 pred_win.set_data(pred_batch_img)
             plt.pause(.05)
             plt.draw()
-
+        '''
+        
         # measure accuracy and record loss
         losses.update(loss.data[0], inputs.size(0))
         acces.update(acc[0], inputs.size(0))

@@ -3,7 +3,7 @@ from __future__ import print_function, absolute_import
 import os
 import argparse
 import time
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import torch
 import torch.nn.parallel
@@ -12,7 +12,7 @@ import torch.optim
 import torchvision.datasets as datasets
 
 from pose import Bar
-from pose.utils.logger import Logger, savefig
+#from pose.utils.logger import Logger, savefig
 from pose.utils.evaluation import accuracy, AverageMeter, final_preds
 from pose.utils.misc import save_checkpoint, save_pred, adjust_learning_rate
 from pose.utils.osutils import mkdir_p, isfile, isdir, join
@@ -63,12 +63,13 @@ def main(args):
             optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))
-            logger = Logger(join(args.checkpoint, 'log.txt'), title=title, resume=True)
+            #logger = Logger(join(args.checkpoint, 'log.txt'), title=title, resume=True)
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
     else:        
-        logger = Logger(join(args.checkpoint, 'log.txt'), title=title)
-        logger.set_names(['Epoch', 'LR', 'Train Loss', 'Val Loss', 'Train Acc', 'Val Acc'])
+        #ogger = Logger(join(args.checkpoint, 'log.txt'), title=title)
+        #logger.set_names(['Epoch', 'LR', 'Train Loss', 'Val Loss', 'Train Acc', 'Val Acc'])
+        print("=> not loading checkpoint...")
 
     cudnn.benchmark = True
     print('    Total params: %.2fM' % (sum(p.numel() for p in model.parameters())/1000000.0))
@@ -110,7 +111,7 @@ def main(args):
                                                       args.debug, args.flip)
 
         # append logger file
-        logger.append([epoch + 1, lr, train_loss, valid_loss, train_acc, valid_acc])
+        #logger.append([epoch + 1, lr, train_loss, valid_loss, train_acc, valid_acc])
 
         # remember best acc and save checkpoint
         is_best = valid_acc > best_acc
@@ -123,9 +124,9 @@ def main(args):
             'optimizer' : optimizer.state_dict(),
         }, predictions, is_best, checkpoint=args.checkpoint)
 
-    logger.close()
-    logger.plot(['Train Acc', 'Val Acc'])
-    savefig(os.path.join(args.checkpoint, 'log.eps'))
+    #logger.close()
+    #logger.plot(['Train Acc', 'Val Acc'])
+    #savefig(os.path.join(args.checkpoint, 'log.eps'))
 
 
 def train(train_loader, model, criterion, optimizer, debug=False, flip=True):
@@ -157,6 +158,7 @@ def train(train_loader, model, criterion, optimizer, debug=False, flip=True):
             loss += criterion(output[j], target_var)
         acc = accuracy(score_map, target, idx)
 
+        '''
         if debug: # visualize groundtruth and predictions
             gt_batch_img = batch_with_heatmap(inputs, target)
             pred_batch_img = batch_with_heatmap(inputs, score_map)
@@ -172,6 +174,7 @@ def train(train_loader, model, criterion, optimizer, debug=False, flip=True):
                 pred_win.set_data(pred_batch_img)
             plt.pause(.05)
             plt.draw()
+        '''
 
         # measure accuracy and record loss
         losses.update(loss.data[0], inputs.size(0))
@@ -251,7 +254,7 @@ def validate(val_loader, model, criterion, num_classes, debug=False, flip=True):
         for n in range(score_map.size(0)):
             predictions[meta['index'][n], :, :] = preds[n, :, :]
 
-
+        '''
         if debug:
             gt_batch_img = batch_with_heatmap(inputs, target)
             pred_batch_img = batch_with_heatmap(inputs, score_map)
@@ -265,6 +268,7 @@ def validate(val_loader, model, criterion, num_classes, debug=False, flip=True):
                 pred_win.set_data(pred_batch_img)
             plt.pause(.05)
             plt.draw()
+        '''
 
         # measure accuracy and record loss
         losses.update(loss.data[0], inputs.size(0))
